@@ -1,0 +1,77 @@
+services:
+  # ----------------------------
+  # Servicio de Postgres (base de datos)
+  # ----------------------------
+  postgres:
+    image: postgres:13                          # Imagen oficial de Postgres v13
+    environment:
+      POSTGRES_USER: airflow                    # Usuario por defecto (usado también por Airflow)
+      POSTGRES_PASSWORD: airflow                # Contraseña de Postgres
+      POSTGRES_DB: airflow                      # Nombre de la base de datos inicial
+    ports:
+      - "5432:5432"                             # Expone Postgres en localhost:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data  # Persistencia de datos en un volumen
+
+  # ----------------------------
+  # Airflow Webserver (UI)
+  # ----------------------------
+  airflow-webserver:
+    image: apache/airflow:2.8.1                 # Imagen oficial de Apache Airflow
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor   # Usamos LocalExecutor (ejecuta tareas en paralelo)
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
+                                                # Cadena de conexión para que Airflow use Postgres como metastore
+    depends_on:
+      - postgres                                # No arranca hasta que Postgres esté disponible
+    ports:
+      - "8080:8080"                             # Exponemos la UI de Airflow en localhost:8080
+    volumes:
+      # Montamos las carpetas de Airflow al contenedor
+      - "C:/Users/Juan Pablo/OneDrive/Escritorio/DATA SCIENTIST/Data Engineering/de_project/airflow/dags:/opt/airflow/dags"         # DAGs
+      - "C:/Users/Juan Pablo/OneDrive/Escritorio/DATA SCIENTIST/Data Engineering/de_project/airflow/plugins:/opt/airflow/plugins"   # Plugins
+      - "C:/Users/Juan Pablo/OneDrive/Escritorio/DATA SCIENTIST/Data Engineering/de_project/airflow/include:/opt/airflow/include"   # Archivos auxiliares
+      - "C:/Users/Juan Pablo/OneDrive/Escritorio/DATA SCIENTIST/Data Engineering/de_project/airflow/include/dbt_profiles:/opt/airflow/dbt_profiles"  # Perfiles de dbt
+      - "./requirements.txt:/requirements.txt"                                                                                      # Archivo de dependencias
+      - "C:/Users/Juan Pablo/OneDrive/Escritorio/DATA SCIENTIST/Data Engineering/de_project:/opt/project"
+      - "C:/Users/Juan Pablo/OneDrive/Escritorio/DATA SCIENTIST/Data Engineering/de_project/airflow/logs:/opt/airflow/logs"
+                   # Montamos TODO el proyecto                           # Montamos TODO el proyecto
+    command: >
+      bash -c "
+        pip install --no-cache-dir -r /requirements.txt &&   # Instalamos dependencias de Python
+        airflow db init &&                                   # Inicializamos metadatos en Postgres
+        airflow users create --username admin --firstname admin --lastname admin --role Admin --email admin@example.com --password admin &&
+                                                            # Creamos un usuario admin en la UI
+        airflow webserver"                                   # Arrancamos el servidor web de Airflow
+
+  # ----------------------------
+  # Airflow Scheduler (ejecutor de DAGs)
+  # ----------------------------
+  airflow-scheduler:
+    image: apache/airflow:2.8.1
+    depends_on:
+      - postgres                                # Necesita Postgres para arrancar
+      - airflow-webserver                       # Opcional: espera que el webserver esté levantado
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor   # Mismo executor que el webserver
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
+                                                # Conexión a Postgres
+    volumes:
+      # Montamos exactamente lo mismo que en el webserver
+      - "C:/Users/Juan Pablo/OneDrive/Escritorio/DATA SCIENTIST/Data Engineering/de_project/airflow/dags:/opt/airflow/dags"
+      - "C:/Users/Juan Pablo/OneDrive/Escritorio/DATA SCIENTIST/Data Engineering/de_project/airflow/plugins:/opt/airflow/plugins"
+      - "C:/Users/Juan Pablo/OneDrive/Escritorio/DATA SCIENTIST/Data Engineering/de_project/airflow/include:/opt/airflow/include"
+      - "C:/Users/Juan Pablo/OneDrive/Escritorio/DATA SCIENTIST/Data Engineering/de_project/airflow/include/dbt_profiles:/opt/airflow/dbt_profiles"
+      - "./requirements.txt:/requirements.txt"
+      - "C:/Users/Juan Pablo/OneDrive/Escritorio/DATA SCIENTIST/Data Engineering/de_project:/opt/project"
+      - "C:/Users/Juan Pablo/OneDrive/Escritorio/DATA SCIENTIST/Data Engineering/de_project/airflow/logs:/opt/airflow/logs"
+    command: >
+      bash -c "
+        pip install --no-cache-dir -r /requirements.txt &&   # Instalamos dependencias
+        airflow scheduler"                                   # Ejecutamos el scheduler de Airflow
+
+# ----------------------------
+# Definición de volúmenes persistentes
+# ----------------------------
+volumes:
+  postgres_data:   # Volumen para persistir la base de datos Postgres

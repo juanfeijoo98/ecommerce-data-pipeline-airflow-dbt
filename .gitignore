@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.env
+
+# Airflow
+airflow/logs/
+airflow/*.pid
+airflow/airflow.db
+
+# Docker / volúmenes locales
+postgres_data/
+*.log
+
+# dbt (artefactos generados)
+de_dbt/target/
+de_dbt/dbt_packages/
+
+# Datos generados (no versionar outputs)
+bronze/
+silver/
+gold/
+
+# SO
+.DS_Store
+Thumbs.db

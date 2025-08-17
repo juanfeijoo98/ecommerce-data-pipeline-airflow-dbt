@@ -1,0 +1,55 @@
+version: 2
+
+models:
+  - name: stg_orders
+    description: "Staging normalizado de la tabla public.orders"
+    columns:
+      - name: order_id
+        tests: [not_null]
+      - name: product
+        tests: [not_null]
+      - name: quantity
+        tests: [not_null]
+      - name: total
+        tests: [not_null]
+
+  - name: fct_sales_by_product
+    description: "Hechos: ventas agregadas por producto"
+    columns:
+      - name: product
+        tests: [not_null, unique]
+      - name: revenue
+        tests: [not_null]
+
+  - name: stg_weather
+    tests: []
+
+  - name: dim_date
+    columns:
+      - name: date_key
+        tests: [not_null, unique]
+      - name: date
+        tests: [not_null]
+
+  - name: dim_weather
+    columns:
+      - name: date_key
+        tests: [not_null, unique]
+      - name: date
+        tests: [not_null]
+
+  - name: dim_product
+    columns:
+      - name: product_key
+        tests: [not_null, unique]
+      - name: product
+        tests: [not_null]
+
+  - name: fact_sales
+    columns:
+      - name: order_id
+        tests: [not_null]
+      - name: product_key
+        tests: [not_null]
+      - name: revenue_eur
+        tests: [not_null]
