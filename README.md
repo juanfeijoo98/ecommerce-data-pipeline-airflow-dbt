@@ -30,3 +30,82 @@ flowchart LR
     C -->|Load to Postgres| D(dbt Staging Models)
     D --> E[Dims & Facts]
     E --> F[Gold Layer - Analytics]
+
+📂 Project Structure
+.
+├── airflow/
+│   ├── dags/
+│   │   ├── batch_sales.py
+│   │   ├── weather_ingest_v2.py
+│   │   └── dbt_run.py
+│   └── include/dbt_profiles/profiles.yml
+├── de_dbt/
+│   ├── models/
+│   │   ├── staging/
+│   │   ├── dims/
+│   │   ├── facts/
+│   │   └── gold/
+│   └── schema.yml
+├── docker/
+│   └── docker-compose.yml
+├── data_seed/   # raw CSV files
+├── requirements.txt
+└── README.md
+
+⚙️ How to Run
+git clone https://github.com/juanfeijoo98/ecommerce-data-pipeline-airflow-dbt.git
+cd ecommerce-data-pipeline-airflow-dbt
+
+Start services with Docker
+
+docker compose up -d
+Access Airflow
+
+Web UI → http://localhost:8080
+
+User: admin | Password: admin
+
+Run DAGs
+
+Trigger batch_sales (ingests and loads sales data)
+
+Trigger weather_ingest_v2 (ingests external data)
+
+dbt models are executed automatically via dbt_run
+
+📊 Example Outputs
+
+Airflow DAG Graph View
+(screenshot here)
+
+dbt test results
+(screenshot here)
+
+Final schema (Gold Layer): fact_orders, dim_customers, dim_products, enriched with weather data.
+
+🛠️ Tech Stack
+
+Airflow – orchestration
+
+dbt (Postgres) – transformations & tests
+
+Docker Compose – containerized environment
+
+Postgres – data warehouse
+
+Python (pandas, SQLAlchemy) – data ingestion
+
+🎯 Use Cases
+
+Retail sales analytics
+
+ETL/ELT best practices
+
+Medallion architecture example
+
+Portfolio project for Data Engineering interviews
+
+📌 Author
+
+👤 Juan Pablo Feijoo
+Aspiring Data Engineer | Data Scientist | Passionate about building scalable data pipelines
