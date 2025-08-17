@@ -1,7 +1,7 @@
 pandas
 pyarrow
 SQLAlchemy>=1.4,<2.0
-psycopg2-binary
+psycopg2-binary==2.9.9
 requests
 dbt-core==1.7.12
 dbt-postgres==1.7.12
