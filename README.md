@@ -31,7 +31,7 @@ flowchart LR
     D --> E[Dims & Facts]
     E --> F[Gold Layer - Analytics]
 
-📂 Project Structure
+
 .
 ├── airflow/
 │   ├── dags/
@@ -109,3 +109,4 @@ Portfolio project for Data Engineering interviews
 
 👤 Juan Pablo Feijoo
 Aspiring Data Engineer | Data Scientist | Passionate about building scalable data pipelines
+
